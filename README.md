@@ -11,10 +11,10 @@ v0.0    - the begining
 
 v1.0    - major functionality is all there, just need to tidy a couple of things up, and fix a few small bugs.
 
-v1.1    - fixed game over screen bug and tidied up gameover screen, start position/direcrio is now random
-        - tidied up start screen
-        - added score in corner, and display on final screen  
-        - added animation? to fruit eating so the game doesnt look like its lagging out
+v1.1    - fixed game over screen bug and tidied up gameover screen, start position/direcrio is now random<br>
+        - tidied up start screen<br>
+        - added score in corner, and display on final screen  <br>
+        - added animation? to fruit eating so the game doesnt look like its lagging out<br>
 
 
 </p>
