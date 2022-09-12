@@ -15,6 +15,10 @@ v1.1    - fixed game over screen bug and tidied up gameover screen, start positi
         - tidied up start screen
         - added score in corner, and display on final screen  
         - added animation? to fruit eating so the game doesnt look like its lagging out
+v1.2    - tidied up inheratance, removed unneeded class methods
+        - added functionality for multiple fruit
+        - fixed bug where fruit could spawn on top of snake, or other fruit. also made it so fruit cannot spawn beside each other.
+        - fixed bug where score didnt reset at gameover. 
 
 
 </p>
@@ -22,8 +26,10 @@ v1.1    - fixed game over screen bug and tidied up gameover screen, start positi
 ---
 ## **ROADMAP**</p>
 
-- bug, fruit can spawn under snake, add check to avoid this
-- improvement, add different gamemodes
+- bug/improvement, random fruit placement lags game when spaces to place fruit get low, fix somehow. 
+- improvement, add different gamemodes, dificuity
+- get ai to play
+
 
 </p>
 

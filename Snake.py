@@ -18,7 +18,8 @@ class Snake():
     def __init__(self, canvas, score):
         self.canvas = canvas
         self.grid  = MainCanvasClass.grid_value
-        self.fruit = Fruit(canvas)
+        self.fruit = Fruit(canvas, self)
+        self.fruit.make()
         self.score = score
         
     def start_position (self):
@@ -42,6 +43,7 @@ class Snake():
             self.canvas.create_rectangle(self.get_rec_points([body[0], body[1]]), fill=self.test1, outline=self.test1, tags=('body', 'snake'))
         
     def move(self):
+        self.list_test()
         if self.eating == True:
             self.fruit.eat()
             if self.snakelist[0][0]%self.grid == 0 and self.snakelist[0][1]%self.grid == 0: 
@@ -83,11 +85,13 @@ class Snake():
         return 2
     
     def fruit_colision(self):
-        a = Fruit.fruit_location 
+        #a = self.fruit.fruit_location #########33
         b = [ self.snakelist[0][0]+(self.snakelist[0][2]*10), self.snakelist[0][1]+(self.snakelist[0][3]*10) ]
-        if a == b:
-            self.eating = True
-            return 
+        for a in self.fruit.fruit_location:
+            if a == b:
+                self.fruit.old_fruit_location = self.fruit.fruit_location.pop(self.fruit.fruit_location.index(a))
+                self.eating = True
+                return 
         return
 
     def keyup(self, event):
@@ -135,19 +139,48 @@ class Snake():
         if self.eating == False:
             self.snakelist[1][0] += self.snakelist[1][2]
             self.snakelist[1][1] += self.snakelist[1][3]
+    
+    def get_snake_position(self):
+        positions=[]
+        for i in self.snakelist:
+            positions.append([i[0], i[1]])
+        for i in self.bodylist:
+            positions.append([i[0], i[1]])
+        return positions
+
+    def list_test(self):
+        sparelist=[]
+        print(type(MainCanvasClass.grid_value), type(MainCanvasClass.framesize[0]))
+        for x in range(MainCanvasClass.grid_value, int(MainCanvasClass.framesize[0]/MainCanvasClass.grid_value)):
+            for y in range(MainCanvasClass.grid_value, int(MainCanvasClass.framesize[1]/MainCanvasClass.grid_value)):
+                sparelist.append([x,y])
+        print(sparelist)
+        
+        
+
+
+    
+
 
 class Fruit:
-    fruit_location=[]
-    tick=0
     
-    def __init__(self, canvas):
+    def __init__(self, canvas, snake):
         self.canvas = canvas
+        self.snake=snake
+        self.fruit_location=[]
+        self.old_fruit_location=[]
+        self.tick=0
+        self.number_of_fruit = 500
+
 
     def eat(self):
-        self.canvas.delete("fruit")
+        self.canvas.tag_lower('fruit', 'snake')
         grid= MainCanvasClass.grid_value
-        self.canvas.create_oval(self.fruit_location[0]+(grid/2)+self.tick, self.fruit_location[1]+(grid/2)+self.tick, self.fruit_location[0]-(grid/2)-self.tick, self.fruit_location[1]-(grid/2)-self.tick, fill='', outline='red', tags='fruit')
-        self.canvas.tag_lower('snake', 'fruit')
+        self.canvas.delete("boom")
+        self.canvas.create_oval(self.old_fruit_location[0]+(grid/2)+self.tick, self.old_fruit_location[1]+(grid/2)+self.tick, self.old_fruit_location[0]-(grid/2)-self.tick, self.old_fruit_location[1]-(grid/2)-self.tick, fill='', outline='red', tags='boom')
+        if self.tick == 90:
+            self.new_location()
+            self.canvas.delete("boom")
         self.tick += 10
         return
         
@@ -156,7 +189,8 @@ class Fruit:
     def make(self):
         self.canvas.delete("fruit")
         self.new_location()
-        self.canvas.create_oval(self.get_oval_points(self.fruit_location), fill='red', outline='yellow', tags='fruit')
+        for i in self.fruit_location:
+            self.canvas.create_oval(self.get_oval_points(i), fill='red', outline='yellow', tags='fruit')
         self.tick = 0
         pass
     
@@ -165,11 +199,19 @@ class Fruit:
         points = [position[0]+(grid/2), position[1]+(grid/2), position[0]-(grid/2), position[1]-(grid/2)]
         return points
 
-    @classmethod
-    def new_location(cls):
+    def new_location(self):
         frame = MainCanvasClass.get_framesize()
-        cls.fruit_location = [randint(1, (frame[0]-10)/10)*10, randint(1, (frame[1]-10)/10)*10]
+        for i in range(0, self.number_of_fruit-len(self.fruit_location)):
+            location = [randint(1, (frame[0]-10)/10)*10, randint(1, (frame[1]-10)/10)*10]
+            while location in self.fruit_location or [location[0]+MainCanvasClass.grid_value, location[1]] in self.fruit_location or [location[0]-MainCanvasClass.grid_value, location[1]] in self.fruit_location or [location[0], location[1]+MainCanvasClass.grid_value] in self.fruit_location or [location[0], location[1]-MainCanvasClass.grid_value] in self.fruit_location:
+                location = [randint(1, (frame[0]-10)/10)*10, randint(1, (frame[1]-10)/10)*10]
+            self.fruit_location.append(location)
+            #print(f"if {location} in {self.snake.get_snake_position()}")
+            if location in self.snake.get_snake_position():
+                self.fruit_location.pop(self.fruit_location.index(location))
+                
         return
+
 
 class MainCanvasClass():
     grid_value = 10
@@ -192,7 +234,7 @@ class MainCanvasClass():
         self.border = self.canvas.create_rectangle(0,0,self.framesize[0],self.framesize[1], fill='', outline='green', width=9, tags=('border'))
         self.score= Score(self.canvas)
         self.snakeclass = Snake(self.canvas, self.score)
-        self.fruit = Fruit(self.canvas)
+        #self.fruit = Fruit(self.canvas)
         self.startframe = StartFrame(self.canvas)
         self.gameover = GameOver(self.canvas, self.score)
         
@@ -202,7 +244,7 @@ class MainCanvasClass():
     def make(self):
         self.canvas.config(width=self.framesize[0], height=self.framesize[1], bg='black')
         self.canvas.grid(column=0, row=0, sticky='nswe')
-        self.fruit.make()
+        #self.fruit.make()
         self.startframe.make()
         self.snakeclass.start()
         self.canvas.bind("<Return>", lambda e: maincanvas.game(e))     
@@ -224,6 +266,7 @@ class MainCanvasClass():
             self.canvas.delete('gameoverframe')
             self.snakeclass.start()
             self.game_status=2
+            self.score.reset_score()
         self.canvas.pack()
         self.move()
     
@@ -247,9 +290,11 @@ class MainCanvasClass():
     def random_point(self):
         return [(randint(1, (self.framesize[0]-self.grid_value)/self.grid_value))*self.grid_value, (randint(1, (self.framesize[1]-self.grid_value)/self.grid_value))*self.grid_value ]
 
+    
     @classmethod
     def get_framesize(cls):
         return cls.framesize
+    
 
 class StartFrame():
         
@@ -282,9 +327,7 @@ class GameOver():
         return 
 
 class Score():
-    pass
     
-
     def __init__ (self, canvas):
         self.scorefont = font.Font(family="Meera", size=30, weight='bold')
         self.position=[MainCanvasClass.get_framesize()[0]-30,30]
@@ -303,6 +346,11 @@ class Score():
         return
     def get_score(self):
         return self.score
+
+    def reset_score(self):
+        self.score = 0
+        return 
+        
     
 
 root = tk.Tk()
