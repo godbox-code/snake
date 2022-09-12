@@ -42,6 +42,9 @@ v1.2    - tidied up inheratance, removed unneeded class methods
 
 - v1.1, done all i am going to do for now. happy with it for what it is.
 
+### v1.2 dev
+- done a bit of housekeeping. looking for more bugs. using random fruit placement is great at the start, but during the endgame when there ar not as many places for fruit it lags the game while looping over values it cant use. i think i will create another class that will store the list of possible locations for the fruit. not sure if a class is nessesary, but it iwll keep it a bit more organized
+
 
 
 
